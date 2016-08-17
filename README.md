@@ -1,3 +1,4 @@
+Modification for including macro %u 
 ranger v.1.7.2
 ==============
 
