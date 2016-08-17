@@ -1,6 +1,5 @@
 # This file is part of ranger, the console file manager.
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
-
 import codecs
 import os
 import re
@@ -217,6 +216,14 @@ class Actions(FileManagerAware, SettingsAware):
                     raise
                 else:
                     return self.notify(e)
+            if _MacroTemplate.delimiter + "u" in string:
+                all_selected=[fl.relative_path for fl in self.fm.thistab.get_selection()] 
+                for sel in all_selected:
+                    string_sel=self.substitute_macros(string,additional={"u":sel},
+                            escape=cmd.escape_macros_for_shell,nosafe=True)
+                    self.notify(string_sel)
+                    self.execute_console(string_sel, wildcards, quantifier)
+                return
         try:
             cmd_class(string, quantifier=quantifier).execute()
         except Exception as e:
@@ -225,7 +232,7 @@ class Actions(FileManagerAware, SettingsAware):
             else:
                 self.notify(e)
 
-    def substitute_macros(self, string, additional=dict(), escape=False):
+    def substitute_macros(self, string, additional=dict(), escape=False, nosafe=False):
         macros = self._get_macros()
         macros.update(additional)
         if escape:
@@ -238,7 +245,12 @@ class Actions(FileManagerAware, SettingsAware):
             for key, value in macros.items():
                 if isinstance(value, list):
                     macros[key] = " ".join(value)
-        result = _MacroTemplate(string).safe_substitute(macros)
+        if nosafe:
+            result=string
+            for key,val in macros.items():
+                result=result.replace(_MacroTemplate.delimiter + key, val)
+        else:
+            result = _MacroTemplate(string).safe_substitute(macros)
         if MACRO_FAIL in result:
             raise ValueError("Could not apply macros to `%s'" % string)
         return result

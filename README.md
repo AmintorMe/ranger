@@ -1,4 +1,8 @@
-Modification for including macro %u 
+-Modification for including macro %u 
+ It execute a command one time for each file selected
+  for example, if you want to add "suffix" to each file selected: 
+    :shell mv %u %usuffix
+  
 ranger v.1.7.2
 ==============
 
