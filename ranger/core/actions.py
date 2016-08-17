@@ -218,11 +218,15 @@ class Actions(FileManagerAware, SettingsAware):
                     return self.notify(e)
             if _MacroTemplate.delimiter + "u" in string:
                 all_selected=[fl.relative_path for fl in self.fm.thistab.get_selection()] 
-                for sel in all_selected:
+                init_file=self.fm.thisfile
+                for item in self.fm.thistab.get_selection():
+                    sel=item.relative_path
+                    self.fm.thisfile=item
                     string_sel=self.substitute_macros(string,additional={"u":sel},
                             escape=cmd.escape_macros_for_shell,nosafe=True)
                     self.notify(string_sel)
                     self.execute_console(string_sel, wildcards, quantifier)
+                self.fm.thisfile=init_file
                 return
         try:
             cmd_class(string, quantifier=quantifier).execute()
