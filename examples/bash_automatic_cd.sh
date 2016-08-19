@@ -17,5 +17,17 @@ function ranger-cd {
     rm -f -- "$tempfile"
 }
 
+function cd-from-ranger()
+{
+    ranger_pid=$(cat /tmp/ranger.pid)
+    echo "get %d" > "/tmp/ranger-ipc.in.${ranger_pid}"
+    cd -- "$(cat /tmp/ranger-ipc.out.${ranger_pid})"
+}
+
+function cd-to-ranger()
+{
+    echo "cd $PWD" > "/tmp/ranger-ipc.in.${ranger_pid}"
+}
+
 # This binds Ctrl-O to ranger-cd:
 bind '"\C-o":"ranger-cd\C-m"'
